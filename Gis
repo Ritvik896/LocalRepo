@@ -1,0 +1,36 @@
+from docx import Document
+
+# Function to replace text inside specific placeholders using a dictionary
+def replace_placeholders_with_dict(doc_path, output_path, replacements):
+    # Load the document
+    document = Document(doc_path)
+
+    # Iterate through each paragraph in the document
+    for para in document.paragraphs:
+        for placeholder, replacement_text in replacements.items():
+            placeholder_formatted = f"<<{placeholder}>>"
+            if placeholder_formatted in para.text:
+                para.text = para.text.replace(placeholder_formatted, f"<<{replacement_text}>>")
+
+    # Iterate through tables (if any) to replace placeholders within table cells
+    for table in document.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for placeholder, replacement_text in replacements.items():
+                    placeholder_formatted = f"<<{placeholder}>>"
+                    if placeholder_formatted in cell.text:
+                        cell.text = cell.text.replace(placeholder_formatted, f"<<{replacement_text}>>")
+
+    # Save the updated document
+    document.save(output_path)
+    print(f"Document saved successfully at {output_path}")
+
+# Example usage
+doc_path = 'input.docx'  # Path to the input Word document
+output_path = 'output.docx'  # Path to save the updated document
+replacements = {
+    'content': 'this is the real content',
+    'hexa': 'I am hexa'
+}
+
+replace_placeholders_with_dict(doc_path, output_path, replacements)
